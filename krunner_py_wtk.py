@@ -42,7 +42,7 @@ import runner_settings
 if sys.version_info < (3, 14):
     sys.exit('krunner-py-wtk needs Python 3.14 or later.')
 
-VERSION = '1.0'
+VERSION = '1.0.1'
 SERVICE = 'io.github.nivaca.PyWtkKRunner'
 PATH = '/runner'
 IFACE = 'org.kde.krunner1'

@@ -1,7 +1,7 @@
 krunner-py-wtk
 ==============
 
-Version 1.0.
+Version 1.0.1.
 
 [py-wtk](https://github.com/nivaca/py-wtk), the English Wiktionary, in
 KRunner (KDE Plasma 6): type `wtk` and a word, and its entries appear.
