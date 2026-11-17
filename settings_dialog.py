@@ -20,6 +20,9 @@ import runner_settings
 from runner_settings import (MOST_DEFINITIONS, MOST_RESULTS, RunnerSettings,
                              good_prefix)
 
+if sys.version_info < (3, 14):
+    sys.exit('krunner-py-wtk needs Python 3.14 or later.')
+
 
 class Dialog:
 

@@ -50,9 +50,9 @@ next search.
 Installing
 ----------
 
-It needs py-wtk (by default in the folder `py-wtk`, or `py-wkt`, next to
-this one), and the D-Bus bindings of Python, which Fedora KDE usually has
-already:
+It needs Python 3.14 or later, py-wtk (by default in the folder `py-wtk`,
+or `py-wkt`, next to this one), and the D-Bus bindings of Python, which
+Fedora KDE usually has already:
 
     $ sudo dnf install python3-dbus python3-gobject
 
