@@ -1,13 +1,15 @@
 """The settings of the runner itself (those of the entries come from
-py-wtk): ~/.config/krunner-py-wtk/settings.ini
+py-wk): ~/.config/krunner-py-wk/settings.ini
 
     [runner]
-    prefix = wtk        ; what starts a search in KRunner: wtk rosa
-    languages = la, es  ; the languages shown (empty: as py-wtk says)
+    prefix = wk        ; what starts a search in KRunner: wk rosa
+    languages = la, es  ; the languages shown (empty: as py-wk says)
     results = 12        ; at most so many matches
     definitions = 3     ; the definitions shown in each match
 
-(Not settings.py: py-wtk has a module of that name.)
+(Not settings.py: py-wk has a module of that name.)  The settings of the
+versions named krunner-py-wtk (~/.config/krunner-py-wtk/settings.ini) are
+moved here once, when there are none yet.
 """
 
 from __future__ import annotations
@@ -17,23 +19,41 @@ import os
 from dataclasses import dataclass
 
 SECTION = 'runner'
-PREFIX = 'wtk'                  # (as usual)
+PREFIX = 'wk'                  # (as usual)
 RESULTS = 12                    # (as usual)
 MOST_RESULTS = 50
 DEFINITIONS = 3                 # (as usual)
 MOST_DEFINITIONS = 10
 
 
-def path() -> str:
+def path(name: str = 'krunner-py-wk') -> str:
     base = os.environ.get('XDG_CONFIG_HOME') or \
         os.path.expanduser('~/.config')
-    return os.path.join(base, 'krunner-py-wtk', 'settings.ini')
+    return os.path.join(base, name, 'settings.ini')
+
+
+#  La carpeta de las versiones llamadas krunner-py-wtk
+OLD_NAME = 'krunner-py-wtk'
+
+
+def move_old() -> None:
+    """The settings of krunner-py-wtk, moved here if there are none yet
+    (its folder is removed if that leaves it empty)."""
+    old = path(OLD_NAME)
+    if os.path.exists(path()) or not os.path.isfile(old):
+        return
+    try:
+        os.makedirs(os.path.dirname(path()), exist_ok=True)
+        os.replace(old, path())
+        os.rmdir(os.path.dirname(old))
+    except OSError:
+        pass                    # (si no se puede, quedan los habituales)
 
 
 @dataclass
 class RunnerSettings:
     prefix: str = PREFIX
-    languages: str = ''         # ('': those of py-wtk)
+    languages: str = ''         # ('': those of py-wk)
     results: int = RESULTS
     definitions: int = DEFINITIONS
 
@@ -57,6 +77,7 @@ def _number(text, usual: int, most: int) -> int:
 def load() -> RunnerSettings:
     """The saved settings (the usual ones where the file has nothing, or
     something wrong)."""
+    move_old()
     parser = configparser.ConfigParser()
     try:
         parser.read(path(), encoding='utf-8')

@@ -1,7 +1,7 @@
-"""py-wtk for KRunner: the entries of a word, as short matches.
+"""py-wk for KRunner: the entries of a word, as short matches.
 
 This part knows nothing of D-Bus, so it can be tested on its own.  It uses
-the program in the folder of py-wtk (see `use`), with its settings (those
+the program in the folder of py-wk (see `use`), with its settings (those
 of the configuration file that its window and command line share) and its
 disk cache of pages.
 
@@ -29,20 +29,20 @@ _PARENT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _usual_folder() -> str:
-    """py-wtk next to this folder (its clone may be called py-wkt)."""
-    for name in ('py-wtk', 'py-wkt'):
+    """py-wk next to this folder (or its clone with an earlier name)."""
+    for name in ('py-wk', 'py-wtk', 'py-wkt'):
         folder = os.path.join(_PARENT, name)
-        if is_py_wtk(folder):
+        if is_py_wk(folder):
             return folder
-    return os.path.join(_PARENT, 'py-wtk')
+    return os.path.join(_PARENT, 'py-wk')
 
 
-def is_py_wtk(folder: str) -> bool:
-    return os.path.isfile(os.path.join(folder, 'pywtk', '__init__.py'))
+def is_py_wk(folder: str) -> bool:
+    return os.path.isfile(os.path.join(folder, 'pywk', '__init__.py'))
 
 
-#  py-wtk, if no other folder is given
-PY_WTK = _usual_folder()
+#  py-wk, if no other folder is given
+PY_WK = _usual_folder()
 #  How many results of a query are remembered (the pages are on disk too)
 REMEMBERED = 40
 #  A definition is cut after so many characters (KRunner has little room)
@@ -77,10 +77,10 @@ class Match:
 
 
 def use(folder: str) -> None:
-    """Makes the package of py-wtk in FOLDER importable."""
+    """Makes the package of py-wk in FOLDER importable."""
     folder = os.path.abspath(os.path.expanduser(folder))
-    if not is_py_wtk(folder):
-        raise FileNotFoundError(f'py-wtk is not in {folder}')
+    if not is_py_wk(folder):
+        raise FileNotFoundError(f'py-wk is not in {folder}')
     if folder not in sys.path:
         sys.path.insert(0, folder)
 
@@ -114,8 +114,8 @@ def entries(rendered_lines: list[str], toc, word: str, language,
             parts_of_speech) -> list[Match]:
     """The entries (a Match for each part of speech) of LANGUAGE, from its
     rendering in brief: TOC holds (depth, title, line)."""
-    from pywtk.api import page_url
-    from pywtk.entry import norm_title
+    from pywk.api import page_url
+    from pywk.entry import norm_title
     lines = rendered_lines
     starts = [line for _, _, line in toc] + [len(lines)]
     out = []
@@ -155,19 +155,19 @@ def entries(rendered_lines: list[str], toc, word: str, language,
 class Lookup:
     """The matches of queries.  `use` must be called first.  CLIENT makes
     the client of Wiktionary, and SUGGEST(word, limit) gives the titles that
-    begin like a word (both from py-wtk, as usual; the tests give others)."""
+    begin like a word (both from py-wk, as usual; the tests give others)."""
 
     def __init__(self, client=None, suggest=None):
-        from pywtk.api import suggestions
+        from pywk.api import suggestions
         self._client = client
         self._suggest = suggest or suggestions
         self._remembered: OrderedDict[tuple, list[Match]] = OrderedDict()
         self.mine = runner_settings.load()
 
     def settings(self):
-        """py-wtk's settings and the runner's, read again (they are small
+        """py-wk's settings and the runner's, read again (they are small
         files, and may have changed in the window of either)."""
-        from pywtk.settings import Settings
+        from pywk.settings import Settings
         self.mine = runner_settings.load()
         return Settings()
 
@@ -189,7 +189,7 @@ class Lookup:
     def matches(self, query: str) -> list[Match]:
         """The matches of QUERY: the entries of the word, or suggestions if
         it has no page.  May take a while (it can ask Wiktionary)."""
-        from pywtk.api import NetworkError, NotFound
+        from pywk.api import NetworkError, NotFound
         st = self.settings()
         key = self._key(query, st)
         if key is None:
@@ -199,7 +199,7 @@ class Lookup:
             return self._remembered[key][:self.mine.results]
         word, languages, preferred, _ = key
         # (a new client each time: its memory of pages would only grow;
-        # the pages stay in the disk cache of py-wtk)
+        # the pages stay in the disk cache of py-wk)
         client = self._client() if self._client else st.client()
         try:
             root = client.page(word)
@@ -217,7 +217,7 @@ class Lookup:
         return found[:self.mine.results]
 
     def _missing(self, word: str) -> list[Match]:
-        from pywtk.api import page_url
+        from pywk.api import page_url
         titles = self._suggest(word, limit=self.mine.results)
         if not titles:
             return [Match('note', word, text=f'No Wiktionary entry for '
@@ -226,10 +226,10 @@ class Lookup:
                       url=page_url(t)) for t in titles]
 
     def _entries(self, word, root, languages, preferred) -> list[Match]:
-        from pywtk.api import page_url
-        from pywtk.entry import (PARTS_OF_SPEECH, Options, available_languages,
+        from pywk.api import page_url
+        from pywk.entry import (PARTS_OF_SPEECH, Options, available_languages,
                                  language_sections, select_languages)
-        from pywtk.render import Style, render_entry
+        from pywk.render import Style, render_entry
         langs = language_sections(root)
         chosen = select_languages(langs, languages, preferred)
         if not chosen:

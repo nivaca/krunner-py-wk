@@ -1,4 +1,4 @@
-"""Tests of the matches (lookup.py), with py-wtk next to this folder and a
+"""Tests of the matches (lookup.py), with py-wk next to this folder and a
 made-up page instead of Wiktionary (they need no network)."""
 
 import os
@@ -45,8 +45,8 @@ class FakeClient:
     asked = []
 
     def page(self, title):
-        from pywtk.api import NotFound
-        from pywtk.dom import parse_html
+        from pywk.api import NotFound
+        from pywk.dom import parse_html
         FakeClient.asked.append(title)
         if title != 'rosa':
             raise NotFound(title)
@@ -54,13 +54,13 @@ class FakeClient:
 
 
 class Offline(unittest.TestCase):
-    """With empty settings (of py-wtk and of the runner) and no network."""
+    """With empty settings (of py-wk and of the runner) and no network."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.old = os.environ.get('XDG_CONFIG_HOME')
         os.environ['XDG_CONFIG_HOME'] = self.tmp.name
-        lookup.use(lookup.PY_WTK)
+        lookup.use(lookup.PY_WK)
         FakeClient.asked = []
         self.suggested = []
 
@@ -77,7 +77,7 @@ class Offline(unittest.TestCase):
         self.tmp.cleanup()
 
 
-@unittest.skipUnless(lookup.is_py_wtk(lookup.PY_WTK), 'needs py-wtk next to it')
+@unittest.skipUnless(lookup.is_py_wk(lookup.PY_WK), 'needs py-wk next to it')
 class MatchTests(Offline):
 
     def test_entries(self):

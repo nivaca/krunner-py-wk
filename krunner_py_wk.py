@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""py-wtk in KRunner: type "wtk rosa" (or "wtk rosa @la") and the entries
+"""py-wk in KRunner: type "wk rosa" (or "wk rosa @la") and the entries
 of the English Wiktionary appear.
 
 A D-Bus runner (the interface org.kde.krunner1): KRunner calls Match for
 each query (see the .desktop file that install.py writes), and Run when a
 match is chosen.  D-Bus starts this program the first time it is needed;
-it stays, with py-wtk loaded.
+it stays, with py-wk loaded.
 
-    python3 krunner_py_wtk.py [--py-wtk FOLDER]
+    python3 krunner_py_wk.py [--py-wk FOLDER]
 
 Wiktionary is on the network, so Match answers when it can: at once if the
 query was answered a moment ago, else after a short pause in the typing
 (a query replaced by the next keystroke is never sent), on a thread, so
-that KRunner is not kept waiting.  The pages stay in py-wtk's disk cache.
+that KRunner is not kept waiting.  The pages stay in py-wk's disk cache.
 
-Enter opens the entry in the window of py-wtk (py-wtk-gui, in that
+Enter opens the entry in the window of py-wk (py-wk-gui, in that
 language); the actions copy the entry, open it on Wiktionary, and open the
-settings of the runner (settings_dialog.py).  "wtk ?" (or "wtk settings")
+settings of the runner (settings_dialog.py).  "wk ?" (or "wk settings")
 gives a single match that opens the settings.  Needs python3-dbus and
 python3-gobject.
 """
@@ -40,15 +40,15 @@ import lookup
 import runner_settings
 
 if sys.version_info < (3, 14):
-    sys.exit('krunner-py-wtk needs Python 3.14 or later.')
+    sys.exit('krunner-py-wk needs Python 3.14 or later.')
 
-VERSION = '1.0.1'
-SERVICE = 'io.github.nivaca.PyWtkKRunner'
+VERSION = '1.1'
+SERVICE = 'io.github.nivaca.PyWkKRunner'
 PATH = '/runner'
 IFACE = 'org.kde.krunner1'
-#  What starts a query, as usual (the settings can change it): wtk rosa
+#  What starts a query, as usual (the settings can change it): wk rosa
 PREFIX = runner_settings.PREFIX
-CATEGORY = 'py-wtk'
+CATEGORY = 'py-wk'
 #  KRunner's types of match (KRunner::QueryMatch::CategoryRelevance)
 EXACT = 100
 POSSIBLE = 30
@@ -56,17 +56,17 @@ POSSIBLE = 30
 PAUSE = 350
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PY_WTK = lookup.PY_WTK
+PY_WK = lookup.PY_WK
 
 
 def icon() -> str:
-    """py-wtk's icon if py-wtk-install.py installed it, else a
+    """py-wk's icon if py-wk-install.py installed it, else a
     dictionary."""
     for base in (os.environ.get('XDG_DATA_HOME') or
                  os.path.expanduser('~/.local/share'), '/usr/share'):
         if glob.glob(os.path.join(base, 'icons', 'hicolor', '*', 'apps',
-                                  'py-wtk.*')):
-            return 'py-wtk'
+                                  'py-wk.*')):
+            return 'py-wk'
     return 'accessories-dictionary'
 
 
@@ -79,7 +79,7 @@ def strip_prefix(query: str, prefix: str = PREFIX) -> str | None:
     return None
 
 
-#  What asks for the settings, after the prefix: wtk ?
+#  What asks for the settings, after the prefix: wk ?
 ASK_SETTINGS = ('?', 'settings')
 
 
@@ -129,11 +129,11 @@ def properties(**values) -> dbus.Dictionary:
 
 class Runner(dbus.service.Object):
 
-    def __init__(self, bus, words: lookup.Lookup, py_wtk: str):
+    def __init__(self, bus, words: lookup.Lookup, py_wk: str):
         # (without a bus, as in the tests: not exported)
         super().__init__(*((bus, PATH) if bus is not None else ()))
         self.words = words
-        self.py_wtk = py_wtk
+        self.py_wk = py_wk
         self.icon = icon()
         self.found: dict[str, lookup.Match] = {}    # (of the last answer)
         self.latest = 0                 # (the number of the last query)
@@ -158,7 +158,7 @@ class Runner(dbus.service.Object):
             return
         if asks_settings(text):
             self.found = {}
-            reply([('settings', 'py-wtk settings', 'configure', EXACT, 1.0,
+            reply([('settings', 'py-wk settings', 'configure', EXACT, 1.0,
                     properties(subtext='The prefix, the languages and the '
                                'number of results',
                                actions=dbus.Array([], signature='s')))])
@@ -166,7 +166,7 @@ class Runner(dbus.service.Object):
         try:
             at_hand = self.words.remembered(text)
         except Exception as e:          # (KRunner shows nothing, else)
-            print(f'krunner-py-wtk: {text!r}: {e!r}', file=sys.stderr)
+            print(f'krunner-py-wk: {text!r}: {e!r}', file=sys.stderr)
             at_hand = None
         if at_hand is not None:
             reply(self.answer(at_hand))
@@ -178,7 +178,7 @@ class Runner(dbus.service.Object):
                     found = [] if number != self.latest else \
                         self.words.matches(text)
             except Exception as e:
-                print(f'krunner-py-wtk: {text!r}: {e!r}', file=sys.stderr)
+                print(f'krunner-py-wk: {text!r}: {e!r}', file=sys.stderr)
                 found = []
             GLib.idle_add(finish, found)
 
@@ -226,34 +226,34 @@ class Runner(dbus.service.Object):
             self.open_window(m)
 
     def open_window(self, m: lookup.Match):
-        """The window of py-wtk, with the word of M (in its language)."""
+        """The window of py-wk, with the word of M (in its language)."""
         args = [m.word]
         if m.kind == 'entry' and (m.code or m.language):
             args += ['-l', m.code or m.language]
         subprocess.Popen([sys.executable,
-                          os.path.join(self.py_wtk, 'py-wtk-gui')] + args,
-                         cwd=self.py_wtk, start_new_session=True)
+                          os.path.join(self.py_wk, 'py-wk-gui')] + args,
+                         cwd=self.py_wk, start_new_session=True)
 
     def open_settings(self):
         subprocess.Popen([sys.executable,
                           os.path.join(HERE, 'settings_dialog.py'),
-                          '--py-wtk', self.py_wtk], start_new_session=True)
+                          '--py-wk', self.py_wk], start_new_session=True)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description='py-wtk in KRunner (a D-Bus runner).')
-    parser.add_argument('--py-wtk', default=PY_WTK, metavar='FOLDER',
-                        help=f'the folder of py-wtk (default: {PY_WTK})')
+        description='py-wk in KRunner (a D-Bus runner).')
+    parser.add_argument('--py-wk', default=PY_WK, metavar='FOLDER',
+                        help=f'the folder of py-wk (default: {PY_WK})')
     parser.add_argument('-V', '--version', action='version',
-                        version=f'krunner-py-wtk {VERSION}')
+                        version=f'krunner-py-wk {VERSION}')
     args = parser.parse_args(argv)
-    lookup.use(args.py_wtk)
+    lookup.use(args.py_wk)
     words = lookup.Lookup()             # (before taking the name: loaded)
     DBusGMainLoop(set_as_default=True)
     bus = dbus.SessionBus()
     name = dbus.service.BusName(SERVICE, bus)  # noqa: F841 (kept)
-    runner = Runner(bus, words, args.py_wtk)  # noqa: F841
+    runner = Runner(bus, words, args.py_wk)  # noqa: F841
     GLib.MainLoop().run()
 
 

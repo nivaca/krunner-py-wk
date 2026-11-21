@@ -29,7 +29,7 @@ class SettingsTests(unittest.TestCase):
     def test_saved_and_read(self):
         self.assertEqual(runner_settings.load(), RunnerSettings())
         self.assertIsNone(runner_settings.stamp())
-        mine = RunnerSettings('wk', 'la, Old English', 5, 2)
+        mine = RunnerSettings('wi', 'la, Old English', 5, 2)
         runner_settings.save(mine)
         self.assertEqual(runner_settings.load(), mine)
         self.assertIsNotNone(runner_settings.stamp())
@@ -41,7 +41,7 @@ class SettingsTests(unittest.TestCase):
         os.makedirs(os.path.dirname(runner_settings.path()))
         with open(runner_settings.path(), 'w') as f:
             f.write('[runner]\nprefix = w t\n')
-        self.assertEqual(runner_settings.load().prefix, 'wtk')
+        self.assertEqual(runner_settings.load().prefix, 'wk')
 
     def test_wrong_values(self):
         os.makedirs(os.path.dirname(runner_settings.path()))

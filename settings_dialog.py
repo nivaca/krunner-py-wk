@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The settings of the py-wtk runner, in a small window:
+"""The settings of the py-wk runner, in a small window:
 
-    python3 settings_dialog.py [--py-wtk FOLDER]
+    python3 settings_dialog.py [--py-wk FOLDER]
 
-The prefix of a search (wtk rosa), the languages shown (those of py-wtk,
+The prefix of a search (wk rosa), the languages shown (those of py-wk,
 or others for KRunner only), how many results to show and how many
 definitions in each.  They are saved in runner_settings.path(); the runner
-sees them at the next query.  The window has the look of py-wtk (its dark
+sees them at the next query.  The window has the look of py-wk (its dark
 mode, its fonts).
 """
 
@@ -21,19 +21,19 @@ from runner_settings import (MOST_DEFINITIONS, MOST_RESULTS, RunnerSettings,
                              good_prefix)
 
 if sys.version_info < (3, 14):
-    sys.exit('krunner-py-wtk needs Python 3.14 or later.')
+    sys.exit('krunner-py-wk needs Python 3.14 or later.')
 
 
 class Dialog:
 
     def __init__(self, root: tk.Tk):
-        from pywtk.settings import Settings
+        from pywk.settings import Settings
         self.root = root
         usual = Settings()
         saved = runner_settings.load()
         self._look(usual)
 
-        root.title('Settings of py-wtk in KRunner')
+        root.title('Settings of py-wk in KRunner')
         frame = ttk.Frame(root, padding=16)
         frame.pack(fill='both', expand=True)
         frame.columnconfigure(1, weight=1)
@@ -51,7 +51,7 @@ class Dialog:
             row=1, column=1, sticky='we', pady=4)
         ttk.Label(frame, style='Muted.TLabel', justify='left', text=(
             'Codes or names, separated by commas (la, es, Old English), or '
-            'all.\nEmpty: as in py-wtk ('
+            'all.\nEmpty: as in py-wk ('
             f'{usual["general.languages"]}).')).grid(
                 row=2, column=1, sticky='w', pady=(0, 6))
         label(3, 'Results, at most')
@@ -102,10 +102,10 @@ class Dialog:
         self.note.config(text=text)
 
     def _look(self, settings):
-        """The dark mode and fonts of py-wtk, if they can be had."""
+        """The dark mode and fonts of py-wk, if they can be had."""
         try:
-            from pywtk.gui_fonts import Fonts
-            from pywtk.gui_theme import Theme
+            from pywk.gui_fonts import Fonts
+            from pywk.gui_theme import Theme
             Fonts.of(self.root, settings)
             Theme.of(self.root)
         except Exception:
@@ -141,15 +141,15 @@ class Dialog:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description='The settings of py-wtk in KRunner.')
-    parser.add_argument('--py-wtk', default=lookup.PY_WTK, metavar='FOLDER',
-                        help=f'the folder of py-wtk (default: {lookup.PY_WTK})')
+        description='The settings of py-wk in KRunner.')
+    parser.add_argument('--py-wk', default=lookup.PY_WK, metavar='FOLDER',
+                        help=f'the folder of py-wk (default: {lookup.PY_WK})')
     args = parser.parse_args(argv)
     try:
-        lookup.use(args.py_wtk)
+        lookup.use(args.py_wk)
     except FileNotFoundError as e:
         sys.exit(f'settings_dialog.py: {e}')
-    root = tk.Tk(className='krunner-py-wtk')
+    root = tk.Tk(className='krunner-py-wk')
     Dialog(root)
     root.mainloop()
 

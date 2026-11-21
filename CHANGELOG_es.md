@@ -1,9 +1,22 @@
 # Registro de cambios
 
-Los cambios notables de krunner-py-wtk. Las versiones publicadas, con sus
-archivos zip, están en
-[GitHub](https://github.com/nivaca/krunner-py-wtk/releases); el código
-está también en [Codeberg](https://codeberg.org/nivaca/krunner-py-wtk).
+Los cambios notables de krunner-py-wk (llamado krunner-py-wtk hasta la
+1.0.1). Las versiones publicadas, con sus archivos zip, están en
+[GitHub](https://github.com/nivaca/krunner-py-wk/releases); el código
+está también en [Codeberg](https://codeberg.org/nivaca/krunner-py-wk).
+Cada entrada conserva el nombre que tenía su versión.
+
+## 1.1 — 2026-11-21
+
+- **Nuevo nombre, krunner-py-wk**, después de que py-wtk pasara a
+  llamarse py-wk: el runner es `krunner_py_wk.py`, su servicio de D-Bus
+  `io.github.nivaca.PyWkKRunner`, su complemento de KRunner `py-wk`, sus
+  ajustes `~/.config/krunner-py-wk/settings.ini`, y el prefijo habitual
+  es `wk` (era `wtk`); `--py-wk` indica la carpeta de py-wk.
+- Encuentra py-wk en una carpeta llamada `py-wk`, `py-wtk` o `py-wkt`
+  junto a la suya, y carga el paquete `pywk`.
+- `install.py` quita los archivos de krunner-py-wtk y detiene ese runner;
+  sus ajustes pasan una vez a la carpeta nueva.
 
 ## 1.0.1 — 2026-11-17
 
